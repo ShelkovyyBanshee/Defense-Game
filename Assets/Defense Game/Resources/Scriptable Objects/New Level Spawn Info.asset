@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 139dfb91ae4c37242ac17be075560e02, type: 3}
+  m_Name: New Level Spawn Info
+  m_EditorClassIdentifier: 
+  _playScriptSceneBefore: 0
+  _waves:
+  - _useWaveClearedCondition: 0
+    _useDamageCondition: 0
+    _damagePercent: 0
+    _useTimeCondition: 0
+    _secondsUntilNextWave: 0
+    _playScriptSceneAfter: 0
+    _spawnCards:
+    - _prefab: {fileID: 0}
+      amount: 0
+      _spawnWithChance: 0
+      _spawnChance: 0
+      _spawnPositionY: 0
+      _spawnPositionX: 0
