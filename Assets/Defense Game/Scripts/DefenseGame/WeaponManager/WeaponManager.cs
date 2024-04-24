@@ -86,6 +86,15 @@ namespace DefenseGame
             }
         }
 
+        public void SwitchToIndex(int index, bool playAnimation)
+        {
+            if (index == _currentWeaponIndex)
+                return;
+
+            _currentWeaponIndex = index;
+            UpdateWeapon(playAnimation);
+        }
+
         private void UpdateWeapon(bool playAnimation)
         {
             var newWeapon = _weapons[_currentWeaponIndex];

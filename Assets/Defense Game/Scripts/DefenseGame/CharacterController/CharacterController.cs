@@ -65,72 +65,61 @@ namespace DefenseGame
 
         private void AttackUpdate()
         {
-            if (_input.IsAttackingInFrame)
-            {
-                if (!_weaponManager.CurrentWeapon.IsLocked)
-                    _controllable.Attack();
-                else if (!_input.IsAutomaticAttackModeOn)
-                {
-                    _onDelayedAttack = true;
-                }
-            }
+            if (!_input.IsAttackingInFrame)
+                return;
+
+            if (!_weaponManager.CurrentWeapon.IsLocked)
+                _controllable.Attack();
+            else if (!_input.IsAutomaticAttackModeOn)
+                _onDelayedAttack = true;
         }
 
         private void WeaponSwitchUpdate()
         {
-            if (_input.IsSwitchingToPreviousInFrame != _input.IsSwitchingToNextInFrame)
+            if (!(_input.IsSwitchingByIndexInFrame &&
+                _input.ChosenWeaponIndex < _weaponManager.WeaponsAmount) &&
+                _input.IsSwitchingToPreviousInFrame == _input.IsSwitchingToNextInFrame)
+                return;
+
+
+            if (!_weaponManager.CurrentWeapon.IsLocked)
             {
-                if (!_weaponManager.CurrentWeapon.IsLocked)
-                {
-                    _weaponManager.CurrentWeapon.onAttackEnds -= OnAttackEnds;
+                _weaponManager.CurrentWeapon.onAttackEnds -= OnAttackEnds;
 
-                    if (_input.IsSwitchingToNextInFrame)
-                        _weaponManager.SwitchToNextWeapon(true);
-                    else
-                        _weaponManager.SwitchToPreviousWeapon(true);
-
-                    _weaponManager.CurrentWeapon.onAttackEnds += OnAttackEnds;
-                }
+                if (_input.IsSwitchingByIndexInFrame)
+                    _weaponManager.SwitchToIndex(_input.ChosenWeaponIndex, true);
                 else
-                {
-                    _onDelayedSwitch = true;
+                    _weaponManager.SwitchByMove(_input.IsSwitchingToNextInFrame ? 1 : -1, true);
+
+                _weaponManager.CurrentWeapon.onAttackEnds += OnAttackEnds;
+            }
+            else
+            {
+                _onDelayedSwitch = true;
+
+                if (_input.IsSwitchingByIndexInFrame)
+                    _delayedSwitchMove = _input.ChosenWeaponIndex;
+                else
                     _delayedSwitchMove += _input.IsSwitchingToNextInFrame ? 1 : -1;
-                }
             }
         }
 
         private void OnAttackEnds()
         {
-            if (_onDelayedAttack && !_onDelayedSwitch)
-            {
-                _controllable.Attack();
-            }
-            else if (_onDelayedSwitch && !_onDelayedAttack)
+            if (_onDelayedSwitch)
             {
                 _weaponManager.CurrentWeapon.onAttackEnds -= OnAttackEnds;
 
-                if (_input.IsAutomaticAttackModeOn)
-                {
-                    _weaponManager.SwitchByMove(_delayedSwitchMove, false);
-                    _controllable.Attack();
-                }
-                else
-                    _weaponManager.SwitchByMove(_delayedSwitchMove, true);
-
-                _weaponManager.CurrentWeapon.onAttackEnds += OnAttackEnds;
-            }
-            else if (_onDelayedAttack && _onDelayedSwitch)
-            {
-                _weaponManager.CurrentWeapon.onAttackEnds -= OnAttackEnds;
-
-                _weaponManager.SwitchByMove(_delayedSwitchMove, false);
-                _controllable.Attack();
+                _weaponManager.SwitchByMove(_delayedSwitchMove, 
+                    !_onDelayedAttack && !_input.IsAutomaticAttackModeOn);
 
                 _weaponManager.CurrentWeapon.onAttackEnds += OnAttackEnds;
             }
 
-            if (!_onDelayedAttack && !_onDelayedSwitch && _input.IsAutomaticAttackModeOn)
+            if (_onDelayedAttack || _input.IsAutomaticAttackModeOn)
+            {
                 _controllable.Attack();
+            }
 
             _onDelayedAttack = false;
             _onDelayedSwitch = false;
